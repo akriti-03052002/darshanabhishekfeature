@@ -963,11 +963,9 @@ function buildSanctumEnvironment(
 
   if (exp.id === 'shiva') {
     // Photorealistic 3D Shiva Temple Garbhagriha Background (Panel 1 Reference & Real Temple Architecture)
-    const bgMat = new THREE.MeshStandardMaterial({
+    const bgMat = new THREE.MeshBasicMaterial({
       map: textures.shivaSanctumBgMap,
-      roughness: 0.65,
-      metalness: 0.02,
-      envMapIntensity: 0.45
+      color: 0xffffff
     });
 
     // Elegant curved architectural sanctum backdrop placed at z = -1.15 behind the altar
@@ -984,10 +982,10 @@ function buildSanctumEnvironment(
       bgCurvePts.push(new THREE.Vector3(bx, 0, bz));
     }
     const bgCurve = new THREE.CatmullRomCurve3(bgCurvePts);
-    const bgPlaneGeo = new THREE.PlaneGeometry(5.8, 2.7, 32, 1);
+    const bgPlaneGeo = new THREE.PlaneGeometry(5.4, 3.04, 32, 1);
     const pAttr = bgPlaneGeo.attributes.position;
     for (let i = 0; i < pAttr.count; i++) {
-      const u = (pAttr.getX(i) + 2.9) / 5.8;
+      const u = (pAttr.getX(i) + 2.7) / 5.4;
       const sample = bgCurve.getPointAt(THREE.MathUtils.clamp(u, 0, 1));
       pAttr.setX(i, sample.x);
       pAttr.setZ(i, sample.z);
@@ -995,8 +993,7 @@ function buildSanctumEnvironment(
     bgPlaneGeo.computeVertexNormals();
 
     const bgMesh = new THREE.Mesh(bgPlaneGeo, bgMat);
-    bgMesh.position.set(0, floorY + 1.35, 0);
-    bgMesh.receiveShadow = true;
+    bgMesh.position.set(0, 0.08, 0);
     env.add(bgMesh);
   } else {
     // 2. Ancient Carved Temple Sanctum Back Wall with DEEP Recessed Garbhagriha Portal
@@ -1120,10 +1117,10 @@ function buildSanctumEnvironment(
     }
   }
 
-  // 4b. Suspended Brass Abhishek Jaladhari Vessel (Iconic Sacred Water Pot dripping over Lingam)
-  if (exp.id === 'shiva') {
+  // 4b. Suspended Brass Abhishek Jaladhari Vessel (Optional legacy pot, omitted when using ornate Om backdrop)
+  if (exp.id === 'shiva_jaladhari_legacy') {
     const jaladhariGroup = new THREE.Group();
-    jaladhariGroup.position.set(0, 1.06, -0.05);
+    jaladhariGroup.position.set(0, 1.28, -0.05);
 
     // 3 Brass Suspension Chains connecting to ceiling beam
     [-0.065, 0.065].forEach((cx) => {
@@ -1285,28 +1282,30 @@ function buildSanctumEnvironment(
 
   env.add(frontLintelBeam, rearLintelBeam, leftLintelBeam, rightLintelBeam);
 
-  // 5. Heavy Hanging Brass Temple Bells (Ghanti) on both sides
-  [-0.68, 0.68].forEach((bx) => {
-    const chain = new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.004, 0.65, 8), brassMat);
-    chain.position.set(bx, 1.45, -0.32);
+  // 5. Heavy Hanging Brass Temple Bells (Ghanti) on both sides (omitted for Shiva sanctum to showcase ornate lamps)
+  if (exp.id !== 'shiva') {
+    [-0.68, 0.68].forEach((bx) => {
+      const chain = new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.004, 0.65, 8), brassMat);
+      chain.position.set(bx, 1.45, -0.32);
 
-    const bellPts = [
-      new THREE.Vector2(0.008, 0.14),
-      new THREE.Vector2(0.028, 0.11),
-      new THREE.Vector2(0.046, 0.05),
-      new THREE.Vector2(0.076, 0.0),
-      new THREE.Vector2(0.068, 0.0),
-      new THREE.Vector2(0.035, 0.05)
-    ];
-    const bell = new THREE.Mesh(new THREE.LatheGeometry(bellPts, 28), brassMat);
-    bell.position.set(bx, 1.05, -0.32);
-    bell.castShadow = true;
+      const bellPts = [
+        new THREE.Vector2(0.008, 0.14),
+        new THREE.Vector2(0.028, 0.11),
+        new THREE.Vector2(0.046, 0.05),
+        new THREE.Vector2(0.076, 0.0),
+        new THREE.Vector2(0.068, 0.0),
+        new THREE.Vector2(0.035, 0.05)
+      ];
+      const bell = new THREE.Mesh(new THREE.LatheGeometry(bellPts, 28), brassMat);
+      bell.position.set(bx, 1.05, -0.32);
+      bell.castShadow = true;
 
-    const clapper = new THREE.Mesh(new THREE.SphereGeometry(0.018, 12, 10), brassMat);
-    clapper.position.set(bx, 1.02, -0.32);
+      const clapper = new THREE.Mesh(new THREE.SphereGeometry(0.018, 12, 10), brassMat);
+      clapper.position.set(bx, 1.02, -0.32);
 
-    env.add(chain, bell, clapper);
-  });
+      env.add(chain, bell, clapper);
+    });
+  }
 
   // 6. Grounded Carved Pooja Altar Platform (Top flush at y = 0.0)
   const altarMat =
@@ -1871,7 +1870,8 @@ function buildShivaAltar(
   waterDrop.scale.set(1.0, 1.45, 1.0);
   waterDrop.position.set(0, -0.068, 0);
   dharapatraGroup.add(waterDrop);
-  group.add(dharapatraGroup);
+  // dharapatraGroup omitted to keep the central glowing Om emblem in the background unobstructed
+  // group.add(dharapatraGroup);
 
   // =========================================================================
   // SACRED REAL FLOWER GARLAND SYSTEM (Panel 2 Reference - Lush Marigold Mala)
