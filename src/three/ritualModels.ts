@@ -1808,11 +1808,12 @@ function buildShivaAltar(
     nagaGroup.add(headGroup);
   });
 
-  // Load Blender Sheshanaga GLB Model
+  // Load Master Photo-Reconstructed Shiva Lingam GLB Model
+  // Includes Padma-Pitha Double Lotus Base, Krishna Shila Lingam, 5-Headed Sheshanaga, and Pushpamala Garland
   try {
     const gltfLoader = new GLTFLoader();
     gltfLoader.load(
-      '/models/sheshanaga_master.glb',
+      '/models/shiva_lingam_master.glb',
       (gltf) => {
         const model = gltf.scene;
         model.traverse((child) => {
@@ -1820,22 +1821,38 @@ function buildShivaAltar(
             const mesh = child as THREE.Mesh;
             mesh.castShadow = true;
             mesh.receiveShadow = true;
-            mesh.material = nagaBrassMat;
+            if (mesh.material) {
+              const mat = mesh.material as THREE.MeshStandardMaterial;
+              mat.envMapIntensity = 0.95;
+              mat.needsUpdate = true;
+            }
           }
         });
-        model.position.set(0, 0, 0);
-        model.scale.set(1.0, 1.0, 1.0);
-        nagaGroup.add(model);
-        hoodMesh.visible = false;
+        model.position.set(0, 0, -0.05);
+        group.add(model);
+
+        // Hide procedural fallback primitives so the photo-reconstructed master sculpture is displayed
+        pitha.visible = false;
+        rim.visible = false;
+        spout.visible = false;
+        lingam.visible = false;
+        chandraMoon.visible = false;
+        tripundraGroup.visible = false;
+        binduRed.visible = false;
+        binduGold.visible = false;
+        urdhvaTilak.visible = false;
+        urdhvaRedLine.visible = false;
+        nagaGroup.visible = false;
+        garlandGroup.visible = false;
+        crownBilva.visible = false;
       },
       undefined,
       (err) => {
-        // Fallback gracefully to high-detail procedural canopy
-        console.warn('Blender Sheshanaga GLB using procedural canopy fallback:', err);
+        console.warn('Master Shiva Lingam GLB using procedural fallback:', err);
       }
     );
   } catch (e) {
-    console.warn('GLTFLoader init fallback:', e);
+    console.warn('GLTFLoader master lingam fallback:', e);
   }
 
   group.add(nagaGroup);
@@ -2414,7 +2431,7 @@ function buildShivaAltar(
       const isPouring = pourRate > 0.03;
       streamMesh.visible = isPouring;
       let impactX = 0;
-      let impactY = 0.54;
+      let impactY = 0.485;
       let impactZ = -0.05;
       let hitLingam = false;
 
@@ -2433,15 +2450,15 @@ function buildShivaAltar(
           arcBuf[2] = curPos.z;
           count = 1;
 
-          const lingamRad = 0.148;
+          const lingamRad = 0.115;
 
           for (let i = 1; i < STREAM_SEGS; i++) {
             curVel.addScaledVector(gAcc, dtStep);
             curPos.addScaledVector(curVel, dtStep);
 
-            // 1. Collision with Lingam hemispherical dome crown (center at y=0.54, z=-0.05)
-            const distDome = curPos.distanceTo(new THREE.Vector3(0, 0.54, -0.05));
-            if (curPos.y >= 0.52 && distDome <= lingamRad) {
+            // 1. Collision with Lingam hemispherical dome crown (center at y=0.38, z=-0.05)
+            const distDome = curPos.distanceTo(new THREE.Vector3(0, 0.38, -0.05));
+            if (curPos.y >= 0.38 && distDome <= lingamRad) {
               hitLingam = true;
               impactX = curPos.x;
               impactY = curPos.y;
@@ -2453,9 +2470,9 @@ function buildShivaAltar(
               break;
             }
 
-            // 2. Collision with Lingam cylindrical body (y: 0.165 to 0.54)
+            // 2. Collision with Lingam cylindrical body (y: 0.18 to 0.38)
             const horizDist = Math.hypot(curPos.x - 0, curPos.z - (-0.05));
-            if (curPos.y >= 0.165 && curPos.y <= 0.54 && horizDist <= lingamRad) {
+            if (curPos.y >= 0.18 && curPos.y <= 0.38 && horizDist <= lingamRad) {
               hitLingam = true;
               impactX = curPos.x;
               impactY = curPos.y;
@@ -2486,7 +2503,7 @@ function buildShivaAltar(
           }
         } else {
           // Guided fallback
-          const crownY = 0.54;
+          const crownY = 0.485;
           count = computeStreamArcPoints(
             spoutWorldPos.x,
             spoutWorldPos.y,
@@ -2500,7 +2517,7 @@ function buildShivaAltar(
           );
           hitLingam = true;
           impactX = arcBuf[(count - 1) * 3] || 0;
-          impactY = 0.54;
+          impactY = 0.485;
           impactZ = arcBuf[(count - 1) * 3 + 2] || -0.05;
         }
 

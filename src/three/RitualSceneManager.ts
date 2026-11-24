@@ -553,36 +553,36 @@ export class RitualSceneManager {
       // Monolithic Lingam cylindrical column
       this.physicsWorld.addStaticBody(
         'lingam-column',
-        new THREE.Vector3(0, 0.35, -0.05),
-        new CylinderCollider(0.148, 0.18)
+        new THREE.Vector3(0, 0.28, -0.05),
+        new CylinderCollider(0.115, 0.20)
       );
 
-      // Lingam rounded dome apex
+      // Lingam rounded dome apex (apex at y=0.495)
       this.physicsWorld.addStaticBody(
         'lingam-dome',
-        new THREE.Vector3(0, 0.54, -0.05),
-        new SphereCollider(0.148)
+        new THREE.Vector3(0, 0.38, -0.05),
+        new SphereCollider(0.115)
       );
 
-      // Tiered Stone Pitha / Yoni base
+      // Tiered Stone Padma-Pitha / Yoni base
       this.physicsWorld.addStaticBody(
         'yoni-base',
-        new THREE.Vector3(0, 0.08, -0.05),
-        new CylinderCollider(0.38, 0.09)
+        new THREE.Vector3(0, 0.09, -0.05),
+        new CylinderCollider(0.29, 0.18)
       );
 
       // Gomukha drainage spout
       this.physicsWorld.addStaticBody(
         'gomukha-spout',
-        new THREE.Vector3(0.38, 0.08, -0.05),
-        new BoxCollider(new THREE.Vector3(0.08, 0.05, 0.14))
+        new THREE.Vector3(0.355, 0.16, -0.05),
+        new BoxCollider(new THREE.Vector3(0.14, 0.05, 0.09))
       );
 
       // Naga 5-headed brass hood / canopy behind Lingam
       this.physicsWorld.addStaticBody(
         'naga-canopy',
-        new THREE.Vector3(0, 0.65, -0.22),
-        new CylinderCollider(0.24, 0.32)
+        new THREE.Vector3(0, 0.48, -0.15),
+        new CylinderCollider(0.20, 0.38)
       );
     }
 
