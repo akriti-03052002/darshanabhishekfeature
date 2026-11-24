@@ -315,6 +315,10 @@ export class RitualSceneManager {
 
     const maxAniso = this.renderer.capabilities.getMaxAnisotropy();
     this.textures = createProceduralTextures(maxAniso);
+    if (exp.id === 'shiva') {
+      this.scene.background = this.textures.shivaSanctumBgMap;
+      this.scene.fog = null;
+    }
     void this.textures.whenReady.then(() => {
       if (!this.disposed) {
         onAssetsReady?.();

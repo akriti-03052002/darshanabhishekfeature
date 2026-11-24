@@ -941,6 +941,52 @@ function buildSanctumEnvironment(
     envMapIntensity: 0.25
   });
 
+  if (exp.id === 'shiva') {
+    // 1. Dedicated transparent shadow-receiver floor (y = 0.0) so the photorealistic marble temple floor,
+    // holy water reflections, and scattered rose petals from the user's sanctum image show through completely!
+    const shadowFloor = new THREE.Mesh(
+      new THREE.PlaneGeometry(16, 16),
+      new THREE.ShadowMaterial({ opacity: 0.38 })
+    );
+    shadowFloor.rotation.x = -Math.PI / 2;
+    shadowFloor.position.y = 0.0;
+    shadowFloor.receiveShadow = true;
+    env.add(shadowFloor);
+
+    // 2. Wide panoramic sanctum backdrop placed at z = -2.4 behind the altar
+    // Sized generously (13.6m wide x 7.6m high) so the complete sacred temple architecture
+    // with carved pillars, hanging lamps, and glowing Om fills the camera view seamlessly
+    const bgMat = new THREE.MeshBasicMaterial({
+      map: textures.shivaSanctumBgMap,
+      color: 0xffffff,
+      depthWrite: false
+    });
+    const bgPlaneGeo = new THREE.PlaneGeometry(13.6, 7.6, 32, 1);
+    const bgMesh = new THREE.Mesh(bgPlaneGeo, bgMat);
+    bgMesh.position.set(0, 1.52, -2.4);
+    env.add(bgMesh);
+
+    // 3. Physically placed warm illumination matching the visual lamps in the sanctum image:
+    // Left standing Deepastambh flame:
+    const lampFlameL = new THREE.PointLight(0xffaa38, 1.8, 6.5, 1.4);
+    lampFlameL.position.set(-1.38, 0.52, -0.6);
+    // Right standing Deepastambh flame:
+    const lampFlameR = new THREE.PointLight(0xffaa38, 1.8, 6.5, 1.4);
+    lampFlameR.position.set(1.38, 0.52, -0.6);
+    // Overhead hanging brass lamps:
+    const hangLampL = new THREE.PointLight(0xffbe58, 1.2, 5.0, 1.5);
+    hangLampL.position.set(-1.45, 1.65, -0.9);
+    const hangLampR = new THREE.PointLight(0xffbe58, 1.2, 5.0, 1.5);
+    hangLampR.position.set(1.45, 1.65, -0.9);
+    // Glowing golden Om sacred halo:
+    const omHalo = new THREE.PointLight(0xffc248, 1.6, 7.0, 1.2);
+    omHalo.position.set(0, 1.88, -2.0);
+
+    env.add(lampFlameL, lampFlameR, hangLampL, hangLampR, omHalo);
+
+    return env;
+  }
+
   // 1. Ancient Stone Flagstone Temple Floor (8.5m x 8.5m)
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(8.5, 8.5), templeStoneMat);
   floor.rotation.x = -Math.PI / 2;
@@ -961,40 +1007,8 @@ function buildSanctumEnvironment(
     env.add(beam);
   });
 
-  if (exp.id === 'shiva') {
-    // Photorealistic 3D Shiva Temple Garbhagriha Background (Panel 1 Reference & Real Temple Architecture)
-    const bgMat = new THREE.MeshBasicMaterial({
-      map: textures.shivaSanctumBgMap,
-      color: 0xffffff
-    });
-
-    // Elegant curved architectural sanctum backdrop placed at z = -1.15 behind the altar
-    // Curving gently gives authentic stereoscopic 3D depth and parallax when viewing in 3D or WebXR!
-    const bgCurvePts: THREE.Vector3[] = [];
-    const bgSegs = 32;
-    const bgRadius = 4.4;
-    const bgSpan = Math.PI * 0.58; // ~105 degrees field of view
-    for (let i = 0; i <= bgSegs; i++) {
-      const t = i / bgSegs;
-      const ang = (t - 0.5) * bgSpan;
-      const bx = Math.sin(ang) * bgRadius;
-      const bz = -0.98 - (bgRadius - Math.cos(ang) * bgRadius);
-      bgCurvePts.push(new THREE.Vector3(bx, 0, bz));
-    }
-    const bgCurve = new THREE.CatmullRomCurve3(bgCurvePts);
-    const bgPlaneGeo = new THREE.PlaneGeometry(5.4, 3.04, 32, 1);
-    const pAttr = bgPlaneGeo.attributes.position;
-    for (let i = 0; i < pAttr.count; i++) {
-      const u = (pAttr.getX(i) + 2.7) / 5.4;
-      const sample = bgCurve.getPointAt(THREE.MathUtils.clamp(u, 0, 1));
-      pAttr.setX(i, sample.x);
-      pAttr.setZ(i, sample.z);
-    }
-    bgPlaneGeo.computeVertexNormals();
-
-    const bgMesh = new THREE.Mesh(bgPlaneGeo, bgMat);
-    bgMesh.position.set(0, 0.08, 0);
-    env.add(bgMesh);
+  if (exp.id === 'shiva_legacy') {
+    // Legacy backdrop
   } else {
     // 2. Ancient Carved Temple Sanctum Back Wall with DEEP Recessed Garbhagriha Portal
     const backWallLeft = new THREE.Mesh(new THREE.BoxGeometry(2.6, 3.4, 0.25), templeStoneMat);
