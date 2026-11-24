@@ -1,0 +1,8 @@
+{
+  "name": "DARSHAN — First-Person Pooja & Seva",
+  "description": "First-person immersive virtual pooja and sacred seva across 9 spiritual traditions with realistic virtual hands in Normal Screen and VR Headset modes.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
